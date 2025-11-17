@@ -6,5 +6,82 @@
     "spiking neural transformer",
     "biologically plausible attention",
     "synaptic plasticity transformer"
+  ],
+  "research_study_list": [
+    {
+      "title": "Analogous to Evolutionary Algorithm: Designing a Unified Sequence Model"
+    },
+    {
+      "title": "Spikformer: When Spiking Neural Network Meets Transformer "
+    },
+    {
+      "title": "BIOT: Biosignal Transformer for Cross-data Learning in the Wild"
+    },
+    {
+      "title": "Redesigning the Transformer Architecture with Insights from Multi-particle Dynamical Systems"
+    },
+    {
+      "title": "Redesigning the Transformer Architecture with Insights from Multi-particle Dynamical Systems"
+    },
+    {
+      "title": "Hebbian Deep Learning Without Feedback"
+    },
+    {
+      "title": "Hebbian Deep Learning Without Feedback"
+    },
+    {
+      "title": "Unsupervised 3D Object Learning through Neuron Activity aware Plasticity"
+    },
+    {
+      "title": "Hebbian Learning based Orthogonal Projection for Continual Learning of Spiking Neural Networks"
+    },
+    {
+      "title": "Outlier-Efficient Hopfield Layers for Large Transformer-Based Models"
+    },
+    {
+      "title": "Spikformer: When Spiking Neural Network Meets Transformer "
+    },
+    {
+      "title": "SpikedAttention: Training-Free and Fully Spike-Driven Transformer-to-SNN Conversion with Winner-Oriented Spike Shift for Softmax Operation"
+    },
+    {
+      "title": "SpikeZIP-TF: Conversion is All You Need for Transformer-based SNN"
+    },
+    {
+      "title": "Spike-driven Transformer"
+    },
+    {
+      "title": "Spatio-Temporal Approximation: A Training-Free SNN Conversion for Transformers"
+    },
+    {
+      "title": "Attention as Implicit Structural Inference"
+    },
+    {
+      "title": "Neural encoding with visual attention"
+    },
+    {
+      "title": "Neural encoding with visual attention"
+    },
+    {
+      "title": "Attention Approximates Sparse Distributed Memory"
+    },
+    {
+      "title": "Biologically Inspired Learning Model for Instructed Vision"
+    },
+    {
+      "title": "Short-Term Plasticity Neurons Learning to Learn and Forget"
+    },
+    {
+      "title": "Short-Term Plasticity Neurons Learning to Learn and Forget"
+    },
+    {
+      "title": "Spatio-Temporal Approximation: A Training-Free SNN Conversion for Transformers"
+    },
+    {
+      "title": "Neuroformer: Multimodal and Multitask Generative Pretraining for Brain Data"
+    },
+    {
+      "title": "Spikformer: When Spiking Neural Network Meets Transformer "
+    }
   ]
 }
