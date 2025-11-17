@@ -9,46 +9,225 @@
   ],
   "research_study_list": [
     {
-      "title": "Analogous to Evolutionary Algorithm: Designing a Unified Sequence Model"
+      "title": "Analogous to Evolutionary Algorithm: Designing a Unified Sequence Model",
+      "abstract": "Inspired by biological evolution, we explain the rationality of Vision Transformer by analogy with the proven practical Evolutionary Algorithm (EA) and derive that both of them have consistent mathematical representation. Analogous to the dynamic local population in EA, we improve the existing transformer structure and propose a more efficient EAT model, and design task-related heads to deal with different tasks more flexibly. Moreover, we introduce the spatial-filling curve into the current vision transformer to sequence image data into a uniform sequential format. Thus we can design a unified EAT framework to address multi-modal tasks, separating the network architecture from the data format adaptation. Our approach achieves state-of-the-art results on the ImageNet classification task compared with recent vision transformer works while having smaller parameters and greater throughput. We further conduct multi-modal tasks to demonstrate the superiority of the unified EAT, e.g., Text-Based Image Retrieval, and our approach improves the rank-1 by +3.7 points over the baseline on the CSS dataset.",
+      "meta_data": {
+        "arxiv_id": "2105.15089v3",
+        "authors": [
+          "Jiangning Zhang",
+          "Chao Xu",
+          "Jian Li",
+          "Wenzhou Chen",
+          "Yabiao Wang",
+          "Ying Tai",
+          "Shuo Chen",
+          "Chengjie Wang",
+          "Feiyue Huang",
+          "Yong Liu"
+        ],
+        "published_date": "2021-05-31T16:20:03Z",
+        "pdf_url": "https://arxiv.org/pdf/2105.15089v3.pdf"
+      }
     },
     {
-      "title": "Spikformer: When Spiking Neural Network Meets Transformer "
+      "title": "Spikformer: When Spiking Neural Network Meets Transformer ",
+      "abstract": "We consider two biologically plausible structures, the Spiking Neural Network (SNN) and the self-attention mechanism. The former offers an energy-efficient and event-driven paradigm for deep learning, while the latter has the ability to capture feature dependencies, enabling Transformer to achieve good performance. It is intuitively promising to explore the marriage between them. In this paper, we consider leveraging both self-attention capability and biological properties of SNNs, and propose a novel Spiking Self Attention (SSA) as well as a powerful framework, named Spiking Transformer (Spikformer). The SSA mechanism in Spikformer models the sparse visual feature by using spike-form Query, Key, and Value without softmax. Since its computation is sparse and avoids multiplication, SSA is efficient and has low computational energy consumption. It is shown that Spikformer with SSA can outperform the state-of-the-art SNNs-like frameworks in image classification on both neuromorphic and static datasets. Spikformer (66.3M parameters) with comparable size to SEW-ResNet-152 (60.2M,69.26%) can achieve 74.81% top1 accuracy on ImageNet using 4 time steps, which is the state-of-the-art in directly trained SNNs models.",
+      "meta_data": {
+        "arxiv_id": "2209.15425v2",
+        "authors": [
+          "Zhaokun Zhou",
+          "Yuesheng Zhu",
+          "Chao He",
+          "Yaowei Wang",
+          "Shuicheng Yan",
+          "Yonghong Tian",
+          "Li Yuan"
+        ],
+        "published_date": "2022-09-29T14:16:49Z",
+        "pdf_url": "https://arxiv.org/pdf/2209.15425v2.pdf"
+      }
     },
     {
-      "title": "BIOT: Biosignal Transformer for Cross-data Learning in the Wild"
+      "title": "BIOT: Biosignal Transformer for Cross-data Learning in the Wild",
+      "abstract": "Biological signals, such as electroencephalograms (EEG), play a crucial role in numerous clinical applications, exhibiting diverse data formats and quality profiles. Current deep learning models for biosignals are typically specialized for specific datasets and clinical settings, limiting their broader applicability. Motivated by the success of large language models in text processing, we explore the development of foundational models that are trained from multiple data sources and can be fine-tuned on different downstream biosignal tasks.\n  To overcome the unique challenges associated with biosignals of various formats, such as mismatched channels, variable sample lengths, and prevalent missing values, we propose a Biosignal Transformer (\\method). The proposed \\method model can enable cross-data learning with mismatched channels, variable lengths, and missing values by tokenizing diverse biosignals into unified \"biosignal sentences\". Specifically, we tokenize each channel into fixed-length segments containing local signal features, flattening them to form consistent \"sentences\". Channel embeddings and {\\em relative} position embeddings are added to preserve spatio-temporal features.\n  The \\method model is versatile and applicable to various biosignal learning settings across different datasets, including joint pre-training for larger models. Comprehensive evaluations on EEG, electrocardiogram (ECG), and human activity sensory signals demonstrate that \\method outperforms robust baselines in common settings and facilitates learning across multiple datasets with different formats. Use CHB-MIT seizure detection task as an example, our vanilla \\method model shows 3\\% improvement over baselines in balanced accuracy, and the pre-trained \\method models (optimized from other data sources) can further bring up to 4\\% improvements.",
+      "meta_data": {
+        "arxiv_id": "2305.10351v1",
+        "authors": [
+          "Chaoqi Yang",
+          "M. Brandon Westover",
+          "Jimeng Sun"
+        ],
+        "published_date": "2023-05-10T19:26:58Z",
+        "pdf_url": "https://arxiv.org/pdf/2305.10351v1.pdf"
+      }
     },
     {
-      "title": "Redesigning the Transformer Architecture with Insights from Multi-particle Dynamical Systems"
+      "title": "Redesigning the Transformer Architecture with Insights from Multi-particle Dynamical Systems",
+      "abstract": "The Transformer and its variants have been proven to be efficient sequence learners in many different domains. Despite their staggering success, a critical issue has been the enormous number of parameters that must be trained (ranging from $10^7$ to $10^{11}$) along with the quadratic complexity of dot-product attention. In this work, we investigate the problem of approximating the two central components of the Transformer -- multi-head self-attention and point-wise feed-forward transformation, with reduced parameter space and computational complexity. We build upon recent developments in analyzing deep neural networks as numerical solvers of ordinary differential equations. Taking advantage of an analogy between Transformer stages and the evolution of a dynamical system of multiple interacting particles, we formulate a temporal evolution scheme, TransEvolve, to bypass costly dot-product attention over multiple stacked layers. We perform exhaustive experiments with TransEvolve on well-known encoder-decoder as well as encoder-only tasks. We observe that the degree of approximation (or inversely, the degree of parameter reduction) has different effects on the performance, depending on the task. While in the encoder-decoder regime, TransEvolve delivers performances comparable to the original Transformer, in encoder-only tasks it consistently outperforms Transformer along with several subsequent variants.",
+      "meta_data": {
+        "arxiv_id": "2109.15142v3",
+        "authors": [
+          "Subhabrata Dutta",
+          "Tanya Gautam",
+          "Soumen Chakrabarti",
+          "Tanmoy Chakraborty"
+        ],
+        "published_date": "2021-09-30T14:01:06Z",
+        "pdf_url": "https://arxiv.org/pdf/2109.15142v3.pdf"
+      }
     },
     {
-      "title": "Redesigning the Transformer Architecture with Insights from Multi-particle Dynamical Systems"
+      "title": "Redesigning the Transformer Architecture with Insights from Multi-particle Dynamical Systems",
+      "abstract": "The Transformer and its variants have been proven to be efficient sequence learners in many different domains. Despite their staggering success, a critical issue has been the enormous number of parameters that must be trained (ranging from $10^7$ to $10^{11}$) along with the quadratic complexity of dot-product attention. In this work, we investigate the problem of approximating the two central components of the Transformer -- multi-head self-attention and point-wise feed-forward transformation, with reduced parameter space and computational complexity. We build upon recent developments in analyzing deep neural networks as numerical solvers of ordinary differential equations. Taking advantage of an analogy between Transformer stages and the evolution of a dynamical system of multiple interacting particles, we formulate a temporal evolution scheme, TransEvolve, to bypass costly dot-product attention over multiple stacked layers. We perform exhaustive experiments with TransEvolve on well-known encoder-decoder as well as encoder-only tasks. We observe that the degree of approximation (or inversely, the degree of parameter reduction) has different effects on the performance, depending on the task. While in the encoder-decoder regime, TransEvolve delivers performances comparable to the original Transformer, in encoder-only tasks it consistently outperforms Transformer along with several subsequent variants.",
+      "meta_data": {
+        "arxiv_id": "2109.15142v3",
+        "authors": [
+          "Subhabrata Dutta",
+          "Tanya Gautam",
+          "Soumen Chakrabarti",
+          "Tanmoy Chakraborty"
+        ],
+        "published_date": "2021-09-30T14:01:06Z",
+        "pdf_url": "https://arxiv.org/pdf/2109.15142v3.pdf"
+      }
     },
     {
-      "title": "Hebbian Deep Learning Without Feedback"
+      "title": "Hebbian Deep Learning Without Feedback",
+      "abstract": "Recent approximations to backpropagation (BP) have mitigated many of BP's computational inefficiencies and incompatibilities with biology, but important limitations still remain. Moreover, the approximations significantly decrease accuracy in benchmarks, suggesting that an entirely different approach may be more fruitful. Here, grounded on recent theory for Hebbian learning in soft winner-take-all networks, we present multilayer SoftHebb, i.e. an algorithm that trains deep neural networks, without any feedback, target, or error signals. As a result, it achieves efficiency by avoiding weight transport, non-local plasticity, time-locking of layer updates, iterative equilibria, and (self-) supervisory or other feedback signals -- which were necessary in other approaches. Its increased efficiency and biological compatibility do not trade off accuracy compared to state-of-the-art bio-plausible learning, but rather improve it. With up to five hidden layers and an added linear classifier, accuracies on MNIST, CIFAR-10, STL-10, and ImageNet, respectively reach 99.4%, 80.3%, 76.2%, and 27.3%. In conclusion, SoftHebb shows with a radically different approach from BP that Deep Learning over few layers may be plausible in the brain and increases the accuracy of bio-plausible machine learning. Code is available at https://github.com/NeuromorphicComputing/SoftHebb.",
+      "meta_data": {
+        "arxiv_id": "2209.11883v2",
+        "authors": [
+          "Adrien Journé",
+          "Hector Garcia Rodriguez",
+          "Qinghai Guo",
+          "Timoleon Moraitis"
+        ],
+        "published_date": "2022-09-23T23:12:59Z",
+        "venue": "The Eleventh International Conference on Learning Representations (2023) Retrieved from https://openreview.net/forum?id=8gd4M-_Rj1",
+        "pdf_url": "https://arxiv.org/pdf/2209.11883v2.pdf"
+      }
     },
     {
-      "title": "Hebbian Deep Learning Without Feedback"
+      "title": "Hebbian Deep Learning Without Feedback",
+      "abstract": "Recent approximations to backpropagation (BP) have mitigated many of BP's computational inefficiencies and incompatibilities with biology, but important limitations still remain. Moreover, the approximations significantly decrease accuracy in benchmarks, suggesting that an entirely different approach may be more fruitful. Here, grounded on recent theory for Hebbian learning in soft winner-take-all networks, we present multilayer SoftHebb, i.e. an algorithm that trains deep neural networks, without any feedback, target, or error signals. As a result, it achieves efficiency by avoiding weight transport, non-local plasticity, time-locking of layer updates, iterative equilibria, and (self-) supervisory or other feedback signals -- which were necessary in other approaches. Its increased efficiency and biological compatibility do not trade off accuracy compared to state-of-the-art bio-plausible learning, but rather improve it. With up to five hidden layers and an added linear classifier, accuracies on MNIST, CIFAR-10, STL-10, and ImageNet, respectively reach 99.4%, 80.3%, 76.2%, and 27.3%. In conclusion, SoftHebb shows with a radically different approach from BP that Deep Learning over few layers may be plausible in the brain and increases the accuracy of bio-plausible machine learning. Code is available at https://github.com/NeuromorphicComputing/SoftHebb.",
+      "meta_data": {
+        "arxiv_id": "2209.11883v2",
+        "authors": [
+          "Adrien Journé",
+          "Hector Garcia Rodriguez",
+          "Qinghai Guo",
+          "Timoleon Moraitis"
+        ],
+        "published_date": "2022-09-23T23:12:59Z",
+        "venue": "The Eleventh International Conference on Learning Representations (2023) Retrieved from https://openreview.net/forum?id=8gd4M-_Rj1",
+        "pdf_url": "https://arxiv.org/pdf/2209.11883v2.pdf"
+      }
     },
     {
-      "title": "Unsupervised 3D Object Learning through Neuron Activity aware Plasticity"
+      "title": "Unsupervised 3D Object Learning through Neuron Activity aware Plasticity",
+      "abstract": "We present an unsupervised deep learning model for 3D object classification. Conventional Hebbian learning, a well-known unsupervised model, suffers from loss of local features leading to reduced performance for tasks with complex geometric objects. We present a deep network with a novel Neuron Activity Aware (NeAW) Hebbian learning rule that dynamically switches the neurons to be governed by Hebbian learning or anti-Hebbian learning, depending on its activity. We analytically show that NeAW Hebbian learning relieves the bias in neuron activity, allowing more neurons to attend to the representation of the 3D objects. Empirical results show that the NeAW Hebbian learning outperforms other variants of Hebbian learning and shows higher accuracy over fully supervised models when training data is limited.",
+      "meta_data": {
+        "arxiv_id": "2302.11622v1",
+        "authors": [
+          "Beomseok Kang",
+          "Biswadeep Chakraborty",
+          "Saibal Mukhopadhyay"
+        ],
+        "published_date": "2023-02-22T19:57:12Z",
+        "pdf_url": "https://arxiv.org/pdf/2302.11622v1.pdf"
+      }
     },
     {
-      "title": "Hebbian Learning based Orthogonal Projection for Continual Learning of Spiking Neural Networks"
+      "title": "Hebbian Learning based Orthogonal Projection for Continual Learning of Spiking Neural Networks",
+      "abstract": "Neuromorphic computing with spiking neural networks is promising for energy-efficient artificial intelligence (AI) applications. However, different from humans who continually learn different tasks in a lifetime, neural network models suffer from catastrophic forgetting. How could neuronal operations solve this problem is an important question for AI and neuroscience. Many previous studies draw inspiration from observed neuroscience phenomena and propose episodic replay or synaptic metaplasticity, but they are not guaranteed to explicitly preserve knowledge for neuron populations. Other works focus on machine learning methods with more mathematical grounding, e.g., orthogonal projection on high dimensional spaces, but there is no neural correspondence for neuromorphic computing. In this work, we develop a new method with neuronal operations based on lateral connections and Hebbian learning, which can protect knowledge by projecting activity traces of neurons into an orthogonal subspace so that synaptic weight update will not interfere with old tasks. We show that Hebbian and anti-Hebbian learning on recurrent lateral connections can effectively extract the principal subspace of neural activities and enable orthogonal projection. This provides new insights into how neural circuits and Hebbian learning can help continual learning, and also how the concept of orthogonal projection can be realized in neuronal systems. Our method is also flexible to utilize arbitrary training methods based on presynaptic activities/traces. Experiments show that our method consistently solves forgetting for spiking neural networks with nearly zero forgetting under various supervised training methods with different error propagation approaches, and outperforms previous approaches under various settings. Our method can pave a solid path for building continual neuromorphic computing systems.",
+      "meta_data": {
+        "arxiv_id": "2402.11984v1",
+        "authors": [
+          "Mingqing Xiao",
+          "Qingyan Meng",
+          "Zongpeng Zhang",
+          "Di He",
+          "Zhouchen Lin"
+        ],
+        "published_date": "2024-02-19T09:29:37Z",
+        "pdf_url": "https://arxiv.org/pdf/2402.11984v1.pdf"
+      }
     },
     {
-      "title": "Outlier-Efficient Hopfield Layers for Large Transformer-Based Models"
+      "title": "Outlier-Efficient Hopfield Layers for Large Transformer-Based Models",
+      "abstract": "We introduce an Outlier-Efficient Modern Hopfield Model (termed $\\mathrm{OutEffHop}$) and use it to address the outlier inefficiency problem of {training} gigantic transformer-based models. Our main contribution is a novel associative memory model facilitating \\textit{outlier-efficient} associative memory retrievals. Interestingly, this memory model manifests a model-based interpretation of an outlier-efficient attention mechanism (${\\rm Softmax}_1$): it is an approximation of the memory retrieval process of $\\mathrm{OutEffHop}$. Methodologically, this allows us to introduce novel outlier-efficient Hopfield layers as powerful alternatives to traditional attention mechanisms, with superior post-quantization performance. Theoretically, the Outlier-Efficient Modern Hopfield Model retains and improves the desirable properties of standard modern Hopfield models, including fixed point convergence and exponential storage capacity. Empirically, we demonstrate the efficacy of the proposed model across large-scale transformer-based and Hopfield-based models (including BERT, OPT, ViT, and STanHop-Net), benchmarking against state-of-the-art methods like $\\mathtt{Clipped\\_Softmax}$ and $\\mathtt{Gated\\_Attention}$. Notably, $\\mathrm{OutEffHop}$ achieves an average reduction of 22+\\% in average kurtosis and 26+\\% in the maximum infinity norm of model outputs across four models. Code is available at \\href{https://github.com/MAGICS-LAB/OutEffHop}{GitHub}; models are on \\href{https://huggingface.co/collections/magicslabnu/outeffhop-6610fcede8d2cda23009a98f}{Hugging Face Hub}; future updates are on \\href{https://arxiv.org/abs/2404.03828}{arXiv}.",
+      "meta_data": {
+        "arxiv_id": "2404.03828v2",
+        "authors": [
+          "Jerry Yao-Chieh Hu",
+          "Pei-Hsuan Chang",
+          "Robin Luo",
+          "Hong-Yu Chen",
+          "Weijian Li",
+          "Wei-Po Wang",
+          "Han Liu"
+        ],
+        "published_date": "2024-04-04T23:08:43Z",
+        "pdf_url": "https://arxiv.org/pdf/2404.03828v2.pdf"
+      }
     },
     {
-      "title": "Spikformer: When Spiking Neural Network Meets Transformer "
+      "title": "Spikformer: When Spiking Neural Network Meets Transformer ",
+      "abstract": "We consider two biologically plausible structures, the Spiking Neural Network (SNN) and the self-attention mechanism. The former offers an energy-efficient and event-driven paradigm for deep learning, while the latter has the ability to capture feature dependencies, enabling Transformer to achieve good performance. It is intuitively promising to explore the marriage between them. In this paper, we consider leveraging both self-attention capability and biological properties of SNNs, and propose a novel Spiking Self Attention (SSA) as well as a powerful framework, named Spiking Transformer (Spikformer). The SSA mechanism in Spikformer models the sparse visual feature by using spike-form Query, Key, and Value without softmax. Since its computation is sparse and avoids multiplication, SSA is efficient and has low computational energy consumption. It is shown that Spikformer with SSA can outperform the state-of-the-art SNNs-like frameworks in image classification on both neuromorphic and static datasets. Spikformer (66.3M parameters) with comparable size to SEW-ResNet-152 (60.2M,69.26%) can achieve 74.81% top1 accuracy on ImageNet using 4 time steps, which is the state-of-the-art in directly trained SNNs models.",
+      "meta_data": {
+        "arxiv_id": "2209.15425v2",
+        "authors": [
+          "Zhaokun Zhou",
+          "Yuesheng Zhu",
+          "Chao He",
+          "Yaowei Wang",
+          "Shuicheng Yan",
+          "Yonghong Tian",
+          "Li Yuan"
+        ],
+        "published_date": "2022-09-29T14:16:49Z",
+        "pdf_url": "https://arxiv.org/pdf/2209.15425v2.pdf"
+      }
     },
     {
       "title": "SpikedAttention: Training-Free and Fully Spike-Driven Transformer-to-SNN Conversion with Winner-Oriented Spike Shift for Softmax Operation"
     },
     {
-      "title": "SpikeZIP-TF: Conversion is All You Need for Transformer-based SNN"
+      "title": "SpikeZIP-TF: Conversion is All You Need for Transformer-based SNN",
+      "abstract": "Spiking neural network (SNN) has attracted great attention due to its characteristic of high efficiency and accuracy. Currently, the ANN-to-SNN conversion methods can obtain ANN on-par accuracy SNN with ultra-low latency (8 time-steps) in CNN structure on computer vision (CV) tasks. However, as Transformer-based networks have achieved prevailing precision on both CV and natural language processing (NLP), the Transformer-based SNNs are still encounting the lower accuracy w.r.t the ANN counterparts. In this work, we introduce a novel ANN-to-SNN conversion method called SpikeZIP-TF, where ANN and SNN are exactly equivalent, thus incurring no accuracy degradation. SpikeZIP-TF achieves 83.82% accuracy on CV dataset (ImageNet) and 93.79% accuracy on NLP dataset (SST-2), which are higher than SOTA Transformer-based SNNs. The code is available in GitHub: https://github.com/Intelligent-Computing-Research-Group/SpikeZIP_transformer",
+      "meta_data": {
+        "arxiv_id": "2406.03470v1",
+        "authors": [
+          "Kang You",
+          "Zekai Xu",
+          "Chen Nie",
+          "Zhijie Deng",
+          "Qinghai Guo",
+          "Xiang Wang",
+          "Zhezhi He"
+        ],
+        "published_date": "2024-06-05T17:24:07Z",
+        "venue": "International Conference on Machine Learning 2024",
+        "pdf_url": "https://arxiv.org/pdf/2406.03470v1.pdf"
+      }
     },
     {
-      "title": "Spike-driven Transformer"
+      "title": "Spike-driven Transformer",
+      "abstract": "Spiking Neural Networks (SNNs) provide an energy-efficient deep learning option due to their unique spike-based event-driven (i.e., spike-driven) paradigm. In this paper, we incorporate the spike-driven paradigm into Transformer by the proposed Spike-driven Transformer with four unique properties: 1) Event-driven, no calculation is triggered when the input of Transformer is zero; 2) Binary spike communication, all matrix multiplications associated with the spike matrix can be transformed into sparse additions; 3) Self-attention with linear complexity at both token and channel dimensions; 4) The operations between spike-form Query, Key, and Value are mask and addition. Together, there are only sparse addition operations in the Spike-driven Transformer. To this end, we design a novel Spike-Driven Self-Attention (SDSA), which exploits only mask and addition operations without any multiplication, and thus having up to $87.2\\times$ lower computation energy than vanilla self-attention. Especially in SDSA, the matrix multiplication between Query, Key, and Value is designed as the mask operation. In addition, we rearrange all residual connections in the vanilla Transformer before the activation functions to ensure that all neurons transmit binary spike signals. It is shown that the Spike-driven Transformer can achieve 77.1\\% top-1 accuracy on ImageNet-1K, which is the state-of-the-art result in the SNN field. The source code is available at https://github.com/BICLab/Spike-Driven-Transformer.",
+      "meta_data": {
+        "arxiv_id": "2307.01694v1",
+        "authors": [
+          "Man Yao",
+          "Jiakui Hu",
+          "Zhaokun Zhou",
+          "Li Yuan",
+          "Yonghong Tian",
+          "Bo Xu",
+          "Guoqi Li"
+        ],
+        "published_date": "2023-07-04T13:00:18Z",
+        "pdf_url": "https://arxiv.org/pdf/2307.01694v1.pdf"
+      }
     },
     {
       "title": "Spatio-Temporal Approximation: A Training-Free SNN Conversion for Transformers"
@@ -57,28 +236,112 @@
       "title": "Attention as Implicit Structural Inference"
     },
     {
-      "title": "Neural encoding with visual attention"
+      "title": "Neural encoding with visual attention",
+      "abstract": "Visual perception is critically influenced by the focus of attention. Due to limited resources, it is well known that neural representations are biased in favor of attended locations. Using concurrent eye-tracking and functional Magnetic Resonance Imaging (fMRI) recordings from a large cohort of human subjects watching movies, we first demonstrate that leveraging gaze information, in the form of attentional masking, can significantly improve brain response prediction accuracy in a neural encoding model. Next, we propose a novel approach to neural encoding by including a trainable soft-attention module. Using our new approach, we demonstrate that it is possible to learn visual attention policies by end-to-end learning merely on fMRI response data, and without relying on any eye-tracking. Interestingly, we find that attention locations estimated by the model on independent data agree well with the corresponding eye fixation patterns, despite no explicit supervision to do so. Together, these findings suggest that attention modules can be instrumental in neural encoding models of visual stimuli.",
+      "meta_data": {
+        "arxiv_id": "2010.00516v1",
+        "authors": [
+          "Meenakshi Khosla",
+          "Gia H. Ngo",
+          "Keith Jamison",
+          "Amy Kuceyeski",
+          "Mert R. Sabuncu"
+        ],
+        "published_date": "2020-10-01T16:04:21Z",
+        "pdf_url": "https://arxiv.org/pdf/2010.00516v1.pdf"
+      }
     },
     {
-      "title": "Neural encoding with visual attention"
+      "title": "Neural encoding with visual attention",
+      "abstract": "Visual perception is critically influenced by the focus of attention. Due to limited resources, it is well known that neural representations are biased in favor of attended locations. Using concurrent eye-tracking and functional Magnetic Resonance Imaging (fMRI) recordings from a large cohort of human subjects watching movies, we first demonstrate that leveraging gaze information, in the form of attentional masking, can significantly improve brain response prediction accuracy in a neural encoding model. Next, we propose a novel approach to neural encoding by including a trainable soft-attention module. Using our new approach, we demonstrate that it is possible to learn visual attention policies by end-to-end learning merely on fMRI response data, and without relying on any eye-tracking. Interestingly, we find that attention locations estimated by the model on independent data agree well with the corresponding eye fixation patterns, despite no explicit supervision to do so. Together, these findings suggest that attention modules can be instrumental in neural encoding models of visual stimuli.",
+      "meta_data": {
+        "arxiv_id": "2010.00516v1",
+        "authors": [
+          "Meenakshi Khosla",
+          "Gia H. Ngo",
+          "Keith Jamison",
+          "Amy Kuceyeski",
+          "Mert R. Sabuncu"
+        ],
+        "published_date": "2020-10-01T16:04:21Z",
+        "pdf_url": "https://arxiv.org/pdf/2010.00516v1.pdf"
+      }
     },
     {
-      "title": "Attention Approximates Sparse Distributed Memory"
+      "title": "Attention Approximates Sparse Distributed Memory",
+      "abstract": "While Attention has come to be an important mechanism in deep learning, there remains limited intuition for why it works so well. Here, we show that Transformer Attention can be closely related under certain data conditions to Kanerva's Sparse Distributed Memory (SDM), a biologically plausible associative memory model. We confirm that these conditions are satisfied in pre-trained GPT2 Transformer models. We discuss the implications of the Attention-SDM map and provide new computational and biological interpretations of Attention.",
+      "meta_data": {
+        "arxiv_id": "2111.05498v2",
+        "authors": [
+          "Trenton Bricken",
+          "Cengiz Pehlevan"
+        ],
+        "published_date": "2021-11-10T02:36:32Z",
+        "venue": "35th Conference on Neural Information Processing Systems (NeurIPS 2021)",
+        "pdf_url": "https://arxiv.org/pdf/2111.05498v2.pdf"
+      }
     },
     {
-      "title": "Biologically Inspired Learning Model for Instructed Vision"
+      "title": "Biologically Inspired Learning Model for Instructed Vision",
+      "abstract": "As part of understanding how the brain learns, ongoing work seeks to combine biological knowledge and current artificial intelligence (AI) modeling in an attempt to find an efficient biologically plausible learning scheme. Current models of biologically plausible learning often use a cortical-like combination of bottom-up (BU) and top-down (TD) processing, where the TD part carries feedback signals used for learning. However, in the visual cortex, the TD pathway plays a second major role of visual attention, by guiding the visual process to locations and tasks of interest. A biological model should therefore combine the two tasks, and learn to guide the visual process. We introduce a model that uses a cortical-like combination of BU and TD processing that naturally integrates the two major functions of the TD stream. The integrated model is obtained by an appropriate connectivity pattern between the BU and TD streams, a novel processing cycle that uses the TD part twice, and the use of 'Counter-Hebb' learning that operates across the streams. We show that the 'Counter-Hebb' mechanism can provide an exact backpropagation synaptic modification. We further demonstrate the model's ability to guide the visual stream to perform a task of interest, achieving competitive performance compared with AI models on standard multi-task learning benchmarks. The successful combination of learning and visual guidance could provide a new view on combining BU and TD processing in human vision, and suggests possible directions for both biologically plausible models and artificial instructed models, such as vision-language models (VLMs).",
+      "meta_data": {
+        "arxiv_id": "2306.02415v3",
+        "authors": [
+          "Roy Abel",
+          "Shimon Ullman"
+        ],
+        "published_date": "2023-06-04T17:38:06Z",
+        "pdf_url": "https://arxiv.org/pdf/2306.02415v3.pdf"
+      }
     },
     {
-      "title": "Short-Term Plasticity Neurons Learning to Learn and Forget"
+      "title": "Short-Term Plasticity Neurons Learning to Learn and Forget",
+      "abstract": "Short-term plasticity (STP) is a mechanism that stores decaying memories in synapses of the cerebral cortex. In computing practice, STP has been used, but mostly in the niche of spiking neurons, even though theory predicts that it is the optimal solution to certain dynamic tasks. Here we present a new type of recurrent neural unit, the STP Neuron (STPN), which indeed turns out strikingly powerful. Its key mechanism is that synapses have a state, propagated through time by a self-recurrent connection-within-the-synapse. This formulation enables training the plasticity with backpropagation through time, resulting in a form of learning to learn and forget in the short term. The STPN outperforms all tested alternatives, i.e. RNNs, LSTMs, other models with fast weights, and differentiable plasticity. We confirm this in both supervised and reinforcement learning (RL), and in tasks such as Associative Retrieval, Maze Exploration, Atari video games, and MuJoCo robotics. Moreover, we calculate that, in neuromorphic or biological circuits, the STPN minimizes energy consumption across models, as it depresses individual synapses dynamically. Based on these, biological STP may have been a strong evolutionary attractor that maximizes both efficiency and computational power. The STPN now brings these neuromorphic advantages also to a broad spectrum of machine learning practice. Code is available at https://github.com/NeuromorphicComputing/stpn",
+      "meta_data": {
+        "arxiv_id": "2206.14048v1",
+        "authors": [
+          "Hector Garcia Rodriguez",
+          "Qinghai Guo",
+          "Timoleon Moraitis"
+        ],
+        "published_date": "2022-06-28T14:47:56Z",
+        "venue": "Proceedings of the 39th International Conference on Machine Learning, 162:18704-18722 (2022)",
+        "pdf_url": "https://arxiv.org/pdf/2206.14048v1.pdf"
+      }
     },
     {
-      "title": "Short-Term Plasticity Neurons Learning to Learn and Forget"
+      "title": "Short-Term Plasticity Neurons Learning to Learn and Forget",
+      "abstract": "Short-term plasticity (STP) is a mechanism that stores decaying memories in synapses of the cerebral cortex. In computing practice, STP has been used, but mostly in the niche of spiking neurons, even though theory predicts that it is the optimal solution to certain dynamic tasks. Here we present a new type of recurrent neural unit, the STP Neuron (STPN), which indeed turns out strikingly powerful. Its key mechanism is that synapses have a state, propagated through time by a self-recurrent connection-within-the-synapse. This formulation enables training the plasticity with backpropagation through time, resulting in a form of learning to learn and forget in the short term. The STPN outperforms all tested alternatives, i.e. RNNs, LSTMs, other models with fast weights, and differentiable plasticity. We confirm this in both supervised and reinforcement learning (RL), and in tasks such as Associative Retrieval, Maze Exploration, Atari video games, and MuJoCo robotics. Moreover, we calculate that, in neuromorphic or biological circuits, the STPN minimizes energy consumption across models, as it depresses individual synapses dynamically. Based on these, biological STP may have been a strong evolutionary attractor that maximizes both efficiency and computational power. The STPN now brings these neuromorphic advantages also to a broad spectrum of machine learning practice. Code is available at https://github.com/NeuromorphicComputing/stpn",
+      "meta_data": {
+        "arxiv_id": "2206.14048v1",
+        "authors": [
+          "Hector Garcia Rodriguez",
+          "Qinghai Guo",
+          "Timoleon Moraitis"
+        ],
+        "published_date": "2022-06-28T14:47:56Z",
+        "venue": "Proceedings of the 39th International Conference on Machine Learning, 162:18704-18722 (2022)",
+        "pdf_url": "https://arxiv.org/pdf/2206.14048v1.pdf"
+      }
     },
     {
       "title": "Spatio-Temporal Approximation: A Training-Free SNN Conversion for Transformers"
     },
     {
-      "title": "Neuroformer: Multimodal and Multitask Generative Pretraining for Brain Data"
+      "title": "Neuroformer: Multimodal and Multitask Generative Pretraining for Brain Data",
+      "abstract": "State-of-the-art systems neuroscience experiments yield large-scale multimodal data, and these data sets require new tools for analysis. Inspired by the success of large pretrained models in vision and language domains, we reframe the analysis of large-scale, cellular-resolution neuronal spiking data into an autoregressive spatiotemporal generation problem. Neuroformer is a multimodal, multitask generative pretrained transformer (GPT) model that is specifically designed to handle the intricacies of data in systems neuroscience. It scales linearly with feature size, can process an arbitrary number of modalities, and is adaptable to downstream tasks, such as predicting behavior. We first trained Neuroformer on simulated datasets, and found that it both accurately predicted simulated neuronal circuit activity, and also intrinsically inferred the underlying neural circuit connectivity, including direction. When pretrained to decode neural responses, the model predicted the behavior of a mouse with only few-shot fine-tuning, suggesting that the model begins learning how to do so directly from the neural representations themselves, without any explicit supervision. We used an ablation study to show that joint training on neuronal responses and behavior boosted performance, highlighting the model's ability to associate behavioral and neural representations in an unsupervised manner. These findings show that Neuroformer can analyze neural datasets and their emergent properties, informing the development of models and hypotheses associated with the brain.",
+      "meta_data": {
+        "arxiv_id": "2311.00136v4",
+        "authors": [
+          "Antonis Antoniades",
+          "Yiyi Yu",
+          "Joseph Canzano",
+          "William Wang",
+          "Spencer LaVere Smith"
+        ],
+        "published_date": "2023-10-31T20:17:32Z",
+        "pdf_url": "https://arxiv.org/pdf/2311.00136v4.pdf"
+      }
     },
     {
       "title": "Spikformer: When Spiking Neural Network Meets Transformer "
