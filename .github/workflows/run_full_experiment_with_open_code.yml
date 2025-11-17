@@ -1,0 +1,148 @@
+name: Run Full Experiment with Open Code (v1)
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "The specific run_id for the full experiment"
+        required: true
+      experiment_iteration:
+        description: "Iteration count"
+        required: true
+      runner_type:
+        description: 'Runner type (e.g., ["ubuntu-latest"], ["self-hosted", "A100"])'
+        required: true
+        default: '["ubuntu-latest"]'
+      model_name:
+        description: "Model to use"
+        required: true
+        default: 'anthropic/claude-sonnet-4-5-20250929'
+
+permissions:
+  id-token: write
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  autonomous-experiment-and-fix:
+    name: Autonomous Experiment and Fix Cycle
+    runs-on: ${{ fromJSON(github.event.inputs.runner_type) }}
+    timeout-minutes: 6000
+    
+    env:
+      SYNC_COMMAND: "uv sync"
+      FULL_EXPERIMENT_COMMAND: |
+        set -e
+        if [ -n "$RESULTS_DIR" ] && [ -d "$RESULTS_DIR" ]; then
+          find "$RESULTS_DIR" -mindepth 1 -delete
+        fi
+        echo "=== [FULL EXPERIMENT] Start for ${{ github.event.inputs.run_id }} at $(date -u) ===" | tee -a "$RESULTS_DIR/stdout.txt"
+
+        uv run python -m src.main \
+          run=${{ github.event.inputs.run_id  }} \
+          wandb.mode=online \
+          results_dir="$RESULTS_DIR" \
+          > >(tee -a "$RESULTS_DIR/stdout.txt") \
+          2> >(tee -a "$RESULTS_DIR/stderr.txt" >&2)
+        echo "=== [FULL EXPERIMENT] PASSED for ${{ github.event.inputs.run_id }} at $(date -u) ===" | tee -a "$RESULTS_DIR/stdout.txt"
+      SEARCH_HF_COMMAND: |
+        curl -s -G \
+          -H "Authorization: Bearer $HF_TOKEN" \
+          --data-urlencode "search=${SEARCH_TERM}" \
+          --data-urlencode "sort=likes" \
+          --data-urlencode "limit=10" \
+          --data-urlencode "direction=-1" \
+          --data-urlencode "full=true" \
+          "https://huggingface.co/api/${RESOURCE_TYPE}" \
+        | jq -r '(.results // .) | map(select(.gated == false and .private == false and .disabled == false)) | .[0]?.id // empty'
+      PROMPT: |
+        You are a fully autonomous AI research assistant. 
+        Your task is to ensure the experiment code for run ID `${{ github.event.inputs.run_id }}` runs successfully to completion to obtain the final results, by executing, analyzing, fixing, and re-validating it.
+        You have been granted full tool access. 
+        
+        Guiding Principles:
+        - Scope: Do not perform any Git operations like commit or push. Your sole responsibility is to make the code runnable.
+        - Method: When fixing errors, Method: When fixing errors, you MUST only modify existing files; do not create or delete any files.
+        - Autonomy: Execute all steps autonomously. Do not ask for permission.
+        - Long-Running Tasks: Be aware that the full experiment can take many hours. You MUST set tool execution timeouts appropriately to avoid premature failures.
+        - Resource Errors: If a Hugging Face resource is unavailable, you MUST find and implement a public alternative. To do this, you MUST first set two variables:
+          1.  `RESOURCE_TYPE`: Set to either `"models"` or `"datasets"`.
+          2.  `SEARCH_TERM`: Set to the resource name from the error to find a corrected or alternative ID.
+          Then, execute `bash -c "$SEARCH_HF_COMMAND"` to get the best alternative ID and update the code.
+
+        Procedure:
+        1.  Initial Setup: First, run `bash -c "$SYNC_COMMAND"` to install dependencies.
+        2.  Run Full Experiment: Execute `bash -c "$FULL_EXPERIMENT_COMMAND"`.
+            While it runs, you MUST monitor progress every 30 minutes by checking only the tail of the output log.
+        3.  Analyze & Fix Loop: If the full experiment fails, you MUST analyze the error, use your tools to fix the code, and then re-run the full experiment. Repeat this cycle until it succeeds.
+            A successful run is only confirmed when a message starting with `=== [FULL EXPERIMENT] PASSED` is present in the output log.
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+          enable-cache: false
+
+      - name: Prepare results dir
+        run: |
+          iteration_dir=".research/iteration${{ github.event.inputs.experiment_iteration }}"
+          mkdir -p "$iteration_dir"
+          echo "RESULTS_DIR=$iteration_dir" >> "$GITHUB_ENV"
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install opencode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+
+      - name: Install bun
+        run: npm install -g bun
+
+      - name: OpenCode Autonomous Run, Fix, and Validate Loop
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+        run: |
+          for i in {1..10}; do
+            opencode run --model "${{ github.event.inputs.model_name }}" "$PROMPT" && break
+            if [ $i -lt 10 ]; then
+              echo "Attempt $i failed with exit code $?. Retrying in $((2**i)) seconds..."
+              sleep $((2**i))
+            else
+              echo "All 10 attempts failed."
+              exit 1
+            fi
+          done
+      
+      - name: Commit and push experiment results
+        if: always()
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
+          git add "$RESULTS_DIR"
+          git add --update .
+
+          if ! git diff --staged --quiet; then
+            git commit -m "[CI] Commit all changes from autonomous run (iteration ${{ github.event.inputs.experiment_iteration }})"
+            for i in {1..5}; do
+              git pull --rebase && git push && break
+              echo "Push failed on attempt $i. Retrying in $((2**i)) seconds..."
+              sleep $((2**i))
+            done
+          else
+            echo "No changes were made by the agent or the experiment."
+          fi

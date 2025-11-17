@@ -1,0 +1,83 @@
+name: Prepare Images for HTML
+
+on:
+  workflow_dispatch:
+    inputs:
+      iteration_id:
+        description: "Iteration ID to use"
+        required: true
+
+jobs:
+  convert-and-upload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@v4
+
+      - name: Install PDF to PNG tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+
+      - name: Convert PDFs to PNGs
+        run: |
+          set -e
+          tmp_dir="/tmp/output_images"
+          mkdir -p "$tmp_dir"
+          research_dir=".research"
+
+          if [ ! -d "$research_dir" ]; then
+            echo "Directory $research_dir not found."
+            exit 0
+          fi
+
+          ITER_DIR=".research/iteration${{ inputs.iteration_id }}"
+          echo "Using iteration: $ITER_DIR"
+
+          if [ ! -d "$ITER_DIR" ]; then
+            echo "Iteration directory $ITER_DIR not found."
+            exit 1
+          fi
+
+          echo "Looking for PDFs in $ITER_DIR subdirectories"
+
+          find "$ITER_DIR" -mindepth 2 -maxdepth 2 -type f -name "*.pdf" | while read pdf; do
+            name=$(basename "$pdf" .pdf)
+            echo "Converting $pdf to PNG..."
+            pdftoppm "$pdf" "$tmp_dir/${name}" -png
+          done
+
+          for png in $tmp_dir/*-1.png; do
+            base=$(basename "$png" -1.png)
+            mv "$png" "$tmp_dir/${base}.png"
+          done
+
+      - name: Copy converted PNGs to gh-pages branch
+        run: |
+          git fetch origin gh-pages || git branch gh-pages
+          git checkout gh-pages
+
+          target_dir="branches/${{ github.ref_name }}/images"
+          mkdir -p "$target_dir"
+          cp /tmp/output_images/*.png "$target_dir"
+
+      - name: Commit and push to gh-pages
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
+          git add branches/
+
+          if ! git diff --staged --quiet; then
+            git commit -m "Upload PNGs from ${{ github.ref_name }}"
+            for i in {1..5}; do
+              git push && break
+              echo "Push failed on attempt $i. Retrying in $((2**i)) seconds..."
+              sleep $((2**i))
+            done
+          else
+            echo "No changes were made by the agent."
+          fi

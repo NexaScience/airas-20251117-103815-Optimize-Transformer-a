@@ -1,0 +1,152 @@
+name: Run Evaluation with Open Code
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_ids:
+        description: 'A JSON array of run_ids to process'
+        required: true
+      experiment_iteration:
+        description: "Iteration count"
+        required: true
+      model_name:
+        description: "Model to use for opencode"
+        default: 'anthropic/claude-sonnet-4-5-20250929'
+
+permissions:
+  id-token: write
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  autonomous-evaluation-and-fix:
+    name: Autonomous Evaluation and Fix Cycle
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    env:
+      SYNC_COMMAND: "uv sync"
+      EVALUATION_COMMAND: |
+        set -e
+        echo "=== [EVALUATION] Start at $(date -u) ==="
+
+        uv run python -m src.evaluate \
+          results_dir="$RESULTS_DIR" \
+          run_ids='${{ inputs.run_ids }}'
+        echo "=== [EVALUATION] PASSED at $(date -u) ==="
+      PROMPT: |
+        You are a fully autonomous AI research assistant.
+        Your task is to ensure the evaluation script runs successfully to completion to generate comparison figures and aggregated metrics, by executing, analyzing, fixing, and re-validating it.
+        You have been granted full tool access.
+
+        Guiding Principles:
+        - Scope: Do not perform any Git operations like commit or push. Your sole responsibility is to make the code runnable.
+        - Method: When fixing errors, you MUST only modify existing files; do not create or delete any files.
+        - Autonomy: Execute all steps autonomously. Do not ask for permission.
+
+        Procedure:
+        1.  Initial Setup: First, run `bash -c "$SYNC_COMMAND"` to install dependencies.
+        2.  Run Evaluation: Execute `bash -c "$EVALUATION_COMMAND"` to generate comparison figures and aggregated metrics.
+        3.  Analyze & Fix Loop: If evaluation fails, you MUST analyze the error, use your tools to fix the code, and then re-run evaluation. Repeat this cycle until it succeeds.
+            A successful run is only confirmed when a message starting with `=== [EVALUATION] PASSED` is present in the output log.
+        4. Visual Quality Check: Once evaluation succeeds, you MUST:
+            a. Locate all generated figures in `$RESULTS_DIR`:
+              - Per-run figures in `$RESULTS_DIR/{run_id}/*.pdf` (or .png)
+              - Comparison figures in `$RESULTS_DIR/comparison/*.pdf` (or .png)
+
+            b. Read and analyze EACH figure by directly viewing the PDF/PNG files (do NOT use JSON files). Assess each figure against the following comprehensive criteria:
+               1. Clarity and Correctness:
+                 - Clear Message: Does the figure convey a clear, unambiguous message? Is the main finding or comparison immediately obvious to the reader?
+                 - Appropriate Chart Type: Is the chosen chart type (e.g., bar, line, scatter) the most effective and conventional way to represent the underlying data and its message?
+                 - Informative Labels: Are the title, axis labels, and legend concise yet fully descriptive? Are units clearly stated where necessary (e.g., "(ms)", "(%)")?
+                 - Data Integrity: Does the visualization accurately represent the data without distortion? Are scales and baselines appropriate?
+
+               2. Visual Polish and Readability:
+                 - Font and Readability: Are all text elements (axis labels, titles, legends, annotations) easily readable and appropriately sized relative to the figure?
+                 - Color and Distinction: Are colors used effectively to distinguish between data series? Are they colorblind-friendly? Is the color scheme professional?
+                 - Layout and Spacing: Is the layout clean, with no overlapping elements? Is whitespace used effectively? Is `tight_layout` or an equivalent applied correctly?
+                 - Data-Ink Ratio: Is the figure free of unnecessary visual clutter (e.g., excessive grid lines, backgrounds, borders)? The focus MUST be on the data itself.
+                 - Resolution: Is the image resolution high enough for publication (e.g., 300 DPI)?
+
+               3. Consistency:
+                 - Scale Consistency: Across related comparison plots, do the Y-axes share a consistent range to allow for fair, unbiased comparison?
+                 - Stylistic Consistency: Is there a consistent style (e.g., fonts, colors, line styles, markers) across all generated figures?
+
+            c. If ANY figure has visual quality issues:
+              - Identify the specific problem (e.g., "font size too small", "inconsistent Y-axis scales")
+              - Modify `src/evaluate.py` to fix the visualization code
+              - Re-run the entire evaluation from step 2
+              - Repeat until ALL figures pass visual quality checks
+
+            d. Only exit successfully when:
+              - Evaluation completes without errors
+              - ALL generated figures meet publication-quality standards
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+          enable-cache: false
+
+      - name: Prepare results dir
+        run: |
+          iteration_dir=".research/iteration${{ github.event.inputs.experiment_iteration }}"
+          mkdir -p "$iteration_dir"
+          echo "RESULTS_DIR=$iteration_dir" >> "$GITHUB_ENV"
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install bun
+        run: npm install -g bun
+
+      - name: Install opencode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+
+      - name: OpenCode Autonomous Evaluation, Fix, and Validate Loop
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+        run: |
+          for i in {1..10}; do
+            opencode run --model "${{ github.event.inputs.model_name }}" "$PROMPT" && break
+            if [ $i -lt 10 ]; then
+              echo "Attempt $i failed with exit code $?. Retrying in $((2**i)) seconds..."
+              sleep $((2**i))
+            else
+              echo "All 10 attempts failed."
+              exit 1
+            fi
+          done
+
+      - name: Commit and push evaluation results
+        if: always()
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
+          git add "$RESULTS_DIR"
+          git add --update .
+
+          if ! git diff --staged --quiet; then
+            git commit -m "[CI] Commit evaluation results (iteration ${{ github.event.inputs.experiment_iteration }})"
+            for i in {1..5}; do
+              git pull --rebase && git push && break
+              echo "Push failed on attempt $i. Retrying in $((2**i)) seconds..."
+              sleep $((2**i))
+            done
+          else
+            echo "No changes were made by the agent or the evaluation."
+          fi

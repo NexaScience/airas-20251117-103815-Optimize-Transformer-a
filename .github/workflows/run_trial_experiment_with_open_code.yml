@@ -1,0 +1,157 @@
+name: Run Trial Experiment with Open Code (v1)
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_ids:
+        description: 'A JSON array of run_ids to process'
+        required: true
+      experiment_iteration:
+        description: "Iteration count"
+        required: true
+      runner_type:
+        description: 'Runner type (e.g., ["ubuntu-latest"], ["self-hosted", "A100"])'
+        required: true
+        default: '["ubuntu-latest"]'
+      model_name:
+        description: "Model to use"
+        required: true
+        default: 'anthropic/claude-sonnet-4-5-20250929'
+
+permissions:
+  id-token: write
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  sequential-run-and-fix:
+    name: Sequentially Run and Fix Experiments
+    runs-on: ${{ fromJSON(github.event.inputs.runner_type) }}
+    timeout-minutes: 120
+    
+    env:
+      SYNC_COMMAND: "uv sync"
+      TRIAL_RUN_COMMAND_TEMPLATE: |
+        set -e
+        echo "=== [TRIAL RUN] Start for ${RUN_ID_PLACEHOLDER} at $(date -u) ===" | tee -a "$RESULTS_DIR/stdout.txt"
+
+        uv run python -m src.main \
+          run=${RUN_ID_PLACEHOLDER} \
+          results_dir="$RESULTS_DIR" \
+          trial_mode=true \
+          > >(tee -a "$RESULTS_DIR/stdout.txt") \
+          2> >(tee -a "$RESULTS_DIR/stderr.txt" >&2)
+
+        echo -e "=== [TRIAL RUN] PASSED for ${RUN_ID_PLACEHOLDER} at $(date -u) ===\n" | tee -a "$RESULTS_DIR/stdout.txt"
+      SEARCH_HF_COMMAND: |
+        curl -s -G \
+          -H "Authorization: Bearer $HF_TOKEN" \
+          --data-urlencode "search=${SEARCH_TERM}" \
+          --data-urlencode "sort=likes" \
+          --data-urlencode "limit=10" \
+          --data-urlencode "direction=-1" \
+          --data-urlencode "full=true" \
+          "https://huggingface.co/api/${RESOURCE_TYPE}" \
+        | jq -r '(.results // .) | map(select(.gated == false and .private == false and .disabled == false)) | .[0]?.id // empty'
+      PROMPT: |
+        You are an autonomous AI research assistant. Your current task is to make the experiment code runnable.
+        You have been granted full tool access. 
+
+        Guiding Principles:
+        - Scope: Do not perform any Git operations like commit or push. Your responsibility is to make the code for the current run ID runnable.
+        - Method: When fixing errors, you MUST only modify existing files; do not create or delete any files.
+        - Autonomy: Execute all steps autonomously. Do not ask for permission.
+        - Resource Errors: If a Hugging Face resource is unavailable, you MUST find and implement a public alternative. To do this, you MUST first set two variables:
+          1.  `RESOURCE_TYPE`: Set to either `"models"` or `"datasets"`.
+          2.  `SEARCH_TERM`: Set to the resource name from the error to find a corrected or alternative ID.
+          Then, execute `bash -c "$SEARCH_HF_COMMAND"` to get the best alternative ID and update the code.
+
+        Procedure:
+        1.  Initial Setup: First, run `bash -c "$SYNC_COMMAND"` to install dependencies.
+        2.  Run Trial: Execute the command `bash -c "$TRIAL_RUN_COMMAND"`.
+        3.  Analyze & Fix: If the command fails with an error, analyze the error, fix the code, and return to step 2. Repeat until it runs without errors.
+            A successful run is only confirmed when a message starting with `=== [TRIAL RUN] PASSED` is present in the output log.
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache Hugging Face models and datasets
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: ${{ runner.os }}-hf-cache-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-hf-cache-
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+          enable-cache: false
+
+      - name: Prepare results directory
+        run: |
+          iteration_dir=".research/iteration${{ github.event.inputs.experiment_iteration }}"
+          mkdir -p "$iteration_dir"
+          echo "RESULTS_DIR=$iteration_dir" >> "$GITHUB_ENV"
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install opencode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+
+      - name: Install bun
+        run: npm install -g bun
+
+      - name: OpenCode Run, Fix, and Validate Loop
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          RUN_IDS: ${{ github.event.inputs.run_ids }}
+        run: |
+          for run_id in $(echo "$RUN_IDS" | jq -r '.[]'); do
+            echo "::group::Processing run_id: $run_id"
+
+            export RUN_ID_PLACEHOLDER=$run_id
+            export TRIAL_RUN_COMMAND=$(echo "$TRIAL_RUN_COMMAND_TEMPLATE" | envsubst)
+
+            for i in {1..10}; do
+              opencode run --model "${{ github.event.inputs.model_name }}" "$PROMPT" && break
+              if [ $i -lt 10 ]; then
+                echo "Attempt $i failed with exit code $?. Retrying in $((2**i)) seconds..."
+                sleep $((2**i))
+              else
+                echo "All 10 attempts failed."
+                exit 1
+              fi
+            done
+
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
+            git add "$RESULTS_DIR"
+            git add --update .
+            
+            if ! git diff --staged --quiet; then
+              git commit -m "[CI] Apply fixes for run_id: $run_id"
+              for i in {1..5}; do
+                git pull --rebase && git push && break
+                echo "Push failed on attempt $i. Retrying in $((2**i)) seconds..."
+                sleep $((2**i))
+              done
+            else
+              echo "No changes were made for run_id: $run_id"
+            fi
+
+            echo "::endgroup::"
+          done
