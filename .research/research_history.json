@@ -464,7 +464,54 @@
     "iterations": [
       {
         "iteration_id": 1,
-        "method": "Multiscale Integral Plasticity for Energy-aware Transformers (MIPET)\n---------------------------------------------------------------------\nNotation: for block l let h_l be post-residual activations, W_l^k each weight matrix (Q,K,V,FFN-up,FFN-down), and C_l the theoretical dense FLOPs of the block.\n\nDual variables (no back-prop):\n  λ_l  – fast homeostatic drive (activation target τ≈1).\n  μ_l  – slow metabolic drive (energy target ρ, e.g. 50% of dense FLOPs).\n\nStep-wise procedure (executed every optimiser step):\n1. Streaming statistics (over 128 random tokens)\n      A_l  ←  EMA_β(|h_l|)                     # activation magnitude\n      F_l  ←  Σ_k nnz(W_l^k) / |W_l^k|         # current density per matrix\n      E_l  =  F_l · C_l                        # estimated FLOPs this block\n2. Dual loss added to task loss\n      L_dual = Σ_l [ λ_l·(A_l−τ)  +  μ_l·(E_l−ρ·C_l) ]\n3. Optimiser step on total loss.\n4. Gradient-free dual updates (β≈0.95, η_fast≈10⁻², η_slow≈10⁻³)\n      λ_l ← λ_l + η_fast · (A_l.detach()−τ)\n      μ_l ← μ_l + η_slow · (E_l.detach()−ρ·C_l)\n5. Weight fusion (as in FISN)\n      scale = exp(−λ_l)\n      for W_l^k:  W_l^k ← scale · W_l^k\n6. Structured pruning triggered by sustained positive μ̂_l = EMA_0.99(μ_l):\n      if μ̂_l > θ (θ≈0.5) then\n          a) prune entire attention heads whose total |W| < γ·median(|W|_heads)\n          b) prune FFN rows whose ℓ₂ norm < γ·median(‖row‖)\n      Masked structures are permanently zeroed and excluded from further gradient updates, instantly reducing E_l.\n7. Regrowth safety net: if μ̂_l becomes < −θ for 500 steps, randomly resurrect 10% of previously removed heads/rows to avoid capacity collapse (mirrors synaptic regrowth).  Regrown parameters are re-initialised with small Gaussian noise.\n\nGlobal hyper-parameters (τ,ρ,β,η_fast,η_slow,θ,γ) are fixed once and reused for all depths, widths, and modalities."
+        "method": "Multiscale Integral Plasticity for Energy-aware Transformers (MIPET)\n---------------------------------------------------------------------\nNotation: for block l let h_l be post-residual activations, W_l^k each weight matrix (Q,K,V,FFN-up,FFN-down), and C_l the theoretical dense FLOPs of the block.\n\nDual variables (no back-prop):\n  λ_l  – fast homeostatic drive (activation target τ≈1).\n  μ_l  – slow metabolic drive (energy target ρ, e.g. 50% of dense FLOPs).\n\nStep-wise procedure (executed every optimiser step):\n1. Streaming statistics (over 128 random tokens)\n      A_l  ←  EMA_β(|h_l|)                     # activation magnitude\n      F_l  ←  Σ_k nnz(W_l^k) / |W_l^k|         # current density per matrix\n      E_l  =  F_l · C_l                        # estimated FLOPs this block\n2. Dual loss added to task loss\n      L_dual = Σ_l [ λ_l·(A_l−τ)  +  μ_l·(E_l−ρ·C_l) ]\n3. Optimiser step on total loss.\n4. Gradient-free dual updates (β≈0.95, η_fast≈10⁻², η_slow≈10⁻³)\n      λ_l ← λ_l + η_fast · (A_l.detach()−τ)\n      μ_l ← μ_l + η_slow · (E_l.detach()−ρ·C_l)\n5. Weight fusion (as in FISN)\n      scale = exp(−λ_l)\n      for W_l^k:  W_l^k ← scale · W_l^k\n6. Structured pruning triggered by sustained positive μ̂_l = EMA_0.99(μ_l):\n      if μ̂_l > θ (θ≈0.5) then\n          a) prune entire attention heads whose total |W| < γ·median(|W|_heads)\n          b) prune FFN rows whose ℓ₂ norm < γ·median(‖row‖)\n      Masked structures are permanently zeroed and excluded from further gradient updates, instantly reducing E_l.\n7. Regrowth safety net: if μ̂_l becomes < −θ for 500 steps, randomly resurrect 10% of previously removed heads/rows to avoid capacity collapse (mirrors synaptic regrowth).  Regrown parameters are re-initialised with small Gaussian noise.\n\nGlobal hyper-parameters (τ,ρ,β,η_fast,η_slow,θ,γ) are fixed once and reused for all depths, widths, and modalities.",
+        "experimental_design": {
+          "experiment_summary": "This experiment evaluates the newly-proposed Multiscale Integral Plasticity for Energy-aware Transformers (MIPET) on an image-classification task.  A standard ViT-Base (86 M parameters) is trained from scratch on ImageNet-1K under four conditions: (A) conventional LayerNorm, (B) FISN (norm-free dense), (C) HISP (norm-free unstructured sparsity) and (D) our MIPET controller.  All configurations share the same training budget (300 epochs, AdamW, cosine LR decay, RandAugment, etc.).\n\nMIPET augments each Transformer block with two integral control signals: a fast homeostatic drive (λ) that keeps post-residual activation magnitude close to τ≈1, and a slow metabolic drive (μ) that keeps per-block FLOPs near a global target ρ·C (ρ=0.6).  At every optimiser step the block computes streaming activation and density statistics, adds a dual loss to the task loss, updates dual variables, fuses the λ gain directly into the weights, and—when μ stays positive—executes structured head- and row-level pruning.  A regrowth protocol reactivates 10 % of previously pruned structures if the energy budget is over-satisfied for 500 steps, preventing capacity collapse without manual tuning.\n\nWe measure task performance (top-1 accuracy), training stability, sparsity pattern, theoretical and real inference FLOPs, latency, and wall-power energy with NVIDIA Nsight on A100 GPUs.  The primary figure of merit is accuracy at equal training cost together with the percentage reduction in measured inference energy relative to the LayerNorm baseline.\n\nA small hyper-parameter sweep (learning-rate, weight-decay, pruning aggressiveness γ, and energy target ρ) is performed with random search (20 trials) on a held-out 50-class ImageNet subset.  The best setting is retrained on the full dataset for the final comparison.",
+          "evaluation_metrics": [
+            "Top-1 Accuracy",
+            "Gradient-Norm Variance",
+            "NaN Count",
+            "Inference GFLOPs",
+            "Inference Latency",
+            "Inference Energy (Joules)",
+            "Task performance under equal training budget and percentage reduction in real measured inference energy (joules) relative to LayerNorm baseline",
+            "Percentage Pruned Heads",
+            "Percentage Pruned FFN Rows",
+            "Total Non-Zero Parameter Count",
+            "GPU Training Hours",
+            "Task performance under equal training budget *and* percentage reduction in real measured inference energy (joules) relative to LayerNorm baseline."
+          ],
+          "proposed_method": "Multiscale Integral Plasticity for Energy-aware Transformers (MIPET)\n1. Every Transformer block l maintains two scalar dual variables: λ_l (fast) and μ_l (slow).\n2. Streaming statistics are updated over 128 randomly sampled activations per forward pass:\n   • A_l ← EMA_β(|h_l|) (β=0.95)\n   • F_l ← Σ_k nnz(W_l^k)/|W_l^k| (current weight density)\n   • E_l = F_l·C_l (estimated FLOPs)\n3. A dual loss L_dual = Σ_l [λ_l(A_l−τ)+μ_l(E_l−ρC_l)] is added to the task loss and back-propagated; λ_l and μ_l themselves do NOT receive gradients.\n4. After the optimiser step, λ and μ are updated by integral control:\n      λ_l ← λ_l + η_fast(A_l−τ)   (η_fast=1e-2)\n      μ_l ← μ_l + η_slow(E_l−ρC_l) (η_slow=1e-3)\n5. All block weights are rescaled in-place by exp(−λ_l), fusing the homeostatic gain (no LayerNorm required).\n6. If the long-term average μ̂_l (EMA 0.99) exceeds θ=0.5, the block prunes:\n      a. Whole attention heads with total |W| below γ·median(|W|_heads) (γ=0.25).\n      b. FFN rows whose ℓ₂ norm is below γ·median(row norms).\n   Masks are permanent and weights are excluded from further gradient updates.\n7. If μ̂_l ≤ −θ for 500 consecutive steps, 10 % of previously pruned heads/rows are randomly re-initialised (Gaussian σ=0.02) and unlocked, providing capacity regrowth.\n8. All global hyper-parameters (τ,ρ,β,η_fast,η_slow,θ,γ) are fixed once and reused across datasets and model sizes, demonstrating robustness and eliminating per-model tuning.",
+          "comparative_methods": [
+            "FISN (Feature-wise linear Integral SN)"
+          ],
+          "models_to_use": [
+            "ViT-Base (86 M)"
+          ],
+          "datasets_to_use": [
+            "ImageNet-1K"
+          ],
+          "hyperparameters_to_search": {
+            "learning_rate": "1e-4-5e-4",
+            "weight_decay": "0.02-0.2",
+            "gamma_prune": "0.15-0.35",
+            "rho_energy_target": "0.5-0.7"
+          }
+        },
+        "experiment_runs": [
+          {
+            "run_id": "proposed-iter1-ViT-Base-86-M-ImageNet-1K",
+            "method_name": "proposed",
+            "model_name": "ViT-Base (86 M)",
+            "dataset_name": "ImageNet-1K"
+          },
+          {
+            "run_id": "comparative-1-iter1-ViT-Base-86-M-ImageNet-1K",
+            "method_name": "comparative-1",
+            "model_name": "ViT-Base (86 M)",
+            "dataset_name": "ImageNet-1K"
+          }
+        ]
       }
     ]
   }
